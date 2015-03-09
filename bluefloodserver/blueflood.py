@@ -3,6 +3,7 @@
 import urllib2
 import urlparse
 import json
+import re
 
 from StringIO import StringIO
 
@@ -33,6 +34,7 @@ def _get_metrics_query_url_resolution(url, tenantId,
 class BluefloodEndpoint():
 
     def __init__(self, ingest_url='http://localhost:19000', retrieve_url='http://localhost:20000', tenant='tenant-id', agent=None):
+        print("starting blueflood v1")     
         self.agent = agent
         self.ingest_url = ingest_url
         self.retrieve_url = retrieve_url
@@ -55,7 +57,8 @@ class BluefloodEndpoint():
             "metricValue": v,
             "metricName": metric_name
         } for t,v in zip(time, value)]
-        self._json_buffer.extend(data)
+        if re.findall(r'app.*', metric_name):
+           self._json_buffer.extend(data)
 
     @inlineCallbacks
     def commit(self):
